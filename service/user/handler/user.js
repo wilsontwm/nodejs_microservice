@@ -1,4 +1,5 @@
 const md5 = require('md5');
+const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { randomString } = require('../kit/random');
@@ -134,6 +135,45 @@ module.exports = class API {
             user.updatedAt = Date.now();
 
             let result = await userRepository.updateUser(user)
+
+            callback(null, {
+                item: userTransformer.toUser(result)
+            })
+        } catch (err){
+            callback({
+                code: this.grpc.status.INTERNAL,
+                message: err.message
+            })
+        }
+    }
+
+    resetPassword = async(payload, callback) => {
+        let user = await userRepository.getUserByEmail(payload.request.email)
+        if(!user) {
+            callback({
+                code: this.grpc.status.NOT_FOUND,
+                message: "User is not registered"
+            });
+            return
+        } else if(!user.isActivated) {
+            callback({
+                code: this.grpc.status.FAILED_PRECONDITION,
+                message: "User is not activated"
+            })
+            return
+        }
+
+        try {
+            // Generate token
+            const buf = crypto.randomBytes(20);
+            const token = buf.toString('hex');
+            user.resetPasswordToken = token;
+            user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+            user.updatedAt = Date.now();
+
+            let result = await userRepository.updateUser(user)
+
+            // TODO: Send reset password email
 
             callback(null, {
                 item: userTransformer.toUser(result)

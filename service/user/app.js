@@ -33,6 +33,7 @@ async function main() {
         loginUser: handler.loginUser,
         activateUser: handler.activateUser,
         resendActivationCode: handler.resendActivationCode,
+        resetPassword: handler.resetPassword,
     })
     
     let address = process.env.HOST + ":" + process.env.PORT;

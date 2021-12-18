@@ -9,6 +9,7 @@ service UserService {
     rpc loginUser(LoginUserRequest) returns (LoginUserResponse) {}
     rpc resendActivationCode(ResendActivationCodeRequest) returns (ResendActivationCodeResponse) {}
     rpc activateUser(ActivateUserRequest) returns (ActivateUserResponse) {}
+    rpc resetPassword(ResetPasswordRequest) returns (ResetPasswordResponse) {}
 }
 
 message RegisterUserRequest {
@@ -31,6 +32,10 @@ message ActivateUserRequest {
     string code = 1;
 }
 
+message ResetPasswordRequest {
+    string email = 1;
+}
+
 message RegisterUserResponse { model.User item = 1; }
 
 message LoginUserResponse { 
@@ -41,3 +46,8 @@ message LoginUserResponse {
 message ResendActivationCodeResponse { model.User item = 1; }
 
 message ActivateUserResponse { model.User item = 1; }
+
+message ResetPasswordResponse { 
+    model.User item = 1; 
+    string token = 2;
+}
