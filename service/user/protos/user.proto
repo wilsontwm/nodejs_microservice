@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package user;
+
+import "model/user.proto";
+
+service UserService {
+    rpc registerUser(RegisterUserRequest) returns (RegisterUserResponse) {}
+    rpc resendActivationCode(ResendActivationCodeRequest) returns (ResendActivationCodeResponse) {}
+}
+
+message RegisterUserRequest {
+    string email = 1;
+    string firstName = 2;
+    string lastName = 3;
+    string password = 4;
+}
+
+message ResendActivationCodeRequest {
+    string email = 1;
+}
+
+message RegisterUserResponse { model.User item = 1; }
+message ResendActivationCodeResponse { model.User item = 1; }

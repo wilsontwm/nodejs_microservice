@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package model;
+
+message User {
+    string id = 1 [json_name="id"];
+    string firstName = 2 [json_name="firstName"];
+    string lastName = 3 [json_name="lastName"];
+    string email = 4 [json_name="email"];
+    string countryCode = 5  [json_name="countryCode"];
+    string phoneNumber = 6  [json_name="phoneNumber"];
+    string photoURL = 7  [json_name="photoURL"];
+    string activationCode = 8 [json_name="activationCode"];
+    string createdDateTime = 9 [json_name="createdAt"];
+    string updatedDateTime = 10 [json_name="updatedAt"];
+}
