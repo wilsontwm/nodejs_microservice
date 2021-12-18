@@ -147,7 +147,7 @@ module.exports = class API {
         }
     }
 
-    resetPassword = async(payload, callback) => {
+    forgetPassword = async(payload, callback) => {
         let user = await userRepository.getUserByEmail(payload.request.email)
         if(!user) {
             callback({
@@ -174,6 +174,39 @@ module.exports = class API {
             let result = await userRepository.updateUser(user)
 
             // TODO: Send reset password email
+
+            callback(null, {
+                item: userTransformer.toUser(result)
+            })
+        } catch (err){
+            callback({
+                code: this.grpc.status.INTERNAL,
+                message: err.message
+            })
+        }
+    }
+
+    resetPassword = async(payload, callback) => {
+        let user = await userRepository.getUserByResetPasswordToken(payload.request.code)
+        if(!user) {
+            callback({
+                code: this.grpc.status.NOT_FOUND,
+                message: "Reset password link is invalid or has expired"
+            });
+            return
+        }
+
+        try {
+
+            const salt = await bcrypt.genSalt(10);
+            const passwordHash = await bcrypt.hash(payload.request.password, salt);
+    
+            user.password = passwordHash;
+            user.resetPasswordToken = null;
+            user.resetPasswordExpires = null
+            user.updatedAt = Date.now();
+
+            let result = await userRepository.updateUser(user)
 
             callback(null, {
                 item: userTransformer.toUser(result)

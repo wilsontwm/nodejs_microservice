@@ -33,6 +33,7 @@ async function main() {
         loginUser: handler.loginUser,
         activateUser: handler.activateUser,
         resendActivationCode: handler.resendActivationCode,
+        forgetPassword: handler.forgetPassword,
         resetPassword: handler.resetPassword,
     })
     

@@ -82,6 +82,17 @@ exports.getUserByActivationCode = async(code) => {
     });
 }
 
+exports.getUserByResetPasswordToken = async(token) => {
+    return new Promise((resolve, reject) => {
+        User.findOne({resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() }}).exec()
+        .then(result => {
+            resolve(result);            
+        }).catch(err => {
+            reject(err);
+        });
+    });
+}
+
 exports.createUser = ({firstName, lastName, email, password}) => {
     return new Promise((resolve, reject) => {
         bcrypt.genSalt(10, (err, salt) => {
