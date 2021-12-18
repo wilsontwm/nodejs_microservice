@@ -30,6 +30,7 @@ async function main() {
     const handler = new Handler(grpc);
     server.addService(userProto.UserService.service, {
         registerUser: handler.register,
+        loginUser: handler.loginUser,
         resendActivationCode: handler.resendActivationCode,
     })
     

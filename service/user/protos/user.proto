@@ -6,6 +6,7 @@ import "model/user.proto";
 
 service UserService {
     rpc registerUser(RegisterUserRequest) returns (RegisterUserResponse) {}
+    rpc loginUser(LoginUserRequest) returns (LoginUserResponse) {}
     rpc resendActivationCode(ResendActivationCodeRequest) returns (ResendActivationCodeResponse) {}
 }
 
@@ -16,9 +17,18 @@ message RegisterUserRequest {
     string password = 4;
 }
 
+message LoginUserRequest {
+    string email = 1;
+    string password = 2;
+}
+
 message ResendActivationCodeRequest {
     string email = 1;
 }
 
 message RegisterUserResponse { model.User item = 1; }
 message ResendActivationCodeResponse { model.User item = 1; }
+message LoginUserResponse { 
+    model.User item = 1; 
+    string token = 2;
+}

@@ -1,4 +1,6 @@
 const md5 = require('md5');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const { randomString } = require('../kit/random');
 const userRepository = require('../repository/user');
 const userTransformer = require("../transformer/user");
@@ -38,8 +40,48 @@ module.exports = class API {
         
     }
 
-    login = async(payload, callback) => {
+    loginUser = async(payload, callback) => {
+        // Get the user by email first
+        let user = await userRepository.getUserByEmail(payload.request.email)
+        if(!user) {
+            callback({
+                code: this.grpc.status.FAILED_PRECONDITION,
+                message: "Email / password is invalid"
+            });
+            return
+        }
 
+        // Check password
+        const match = await bcrypt.compare(payload.request.password, user.password);
+        if(!match) {
+            callback({
+                code: this.grpc.status.FAILED_PRECONDITION,
+                message: "Email / password is invalid"
+            });
+            return
+        } else if(!user.isActivated) {
+            callback({
+                code: this.grpc.status.FAILED_PRECONDITION,
+                message: "User is not activated"
+            });
+            return
+        }
+
+        const token = jwt.sign(
+            {
+                id: user._id,
+                email: user.email
+            }, 
+            process.env.JWT_KEY,
+            {
+                expiresIn: "1h"
+            }
+        );
+
+        callback(null, {
+            item: userTransformer.toUser(user),
+            token
+        })
     }
 
     resendActivationCode = async(payload, callback) => {
@@ -57,6 +99,8 @@ module.exports = class API {
             user.updatedAt = Date.now();
 
             let result = await userRepository.updateUser(user)
+
+            // TODO: Send activation code email
 
             callback(null, {
                 item: userTransformer.toUser(result)
