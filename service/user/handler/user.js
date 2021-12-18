@@ -218,4 +218,30 @@ module.exports = class API {
             })
         }
     }
+
+    verifyToken = async(payload, callback) => {
+        jwt.verify(payload.request.token, process.env.JWT_KEY, async(err, decoded) => {
+            if(err) {
+                callback({
+                    code: this.grpc.status.UNAUTHENTICATED,
+                    message: "Unauthenticated access"
+                });
+                return
+            }
+
+            let user = await userRepository.getUserByID(decoded.id)
+            if(!user) {
+                callback({
+                    code: this.grpc.status.UNAUTHENTICATED,
+                    message: "Unauthenticated access"
+                });
+                return
+            }
+
+            callback(null, {
+                item: userTransformer.toUser(user)
+            })
+        });
+        
+    }
 }

@@ -11,6 +11,7 @@ service UserService {
     rpc activateUser(ActivateUserRequest) returns (ActivateUserResponse) {}
     rpc forgetPassword(ForgetPasswordRequest) returns (ForgetPasswordResponse) {}
     rpc resetPassword(ResetPasswordRequest) returns (ResetPasswordResponse) {}
+    rpc verifyToken(VerifyTokenRequest) returns (VerifyTokenResponse) {}
 }
 
 message RegisterUserRequest {
@@ -42,6 +43,10 @@ message ResetPasswordRequest {
     string password = 2;
 }
 
+message VerifyTokenRequest {
+    string token = 1;
+}
+
 message RegisterUserResponse { model.User item = 1; }
 
 message LoginUserResponse { 
@@ -57,4 +62,7 @@ message ForgetPasswordResponse {
     model.User item = 1; 
     string token = 2;
 }
+
 message ResetPasswordResponse { model.User item = 1; }
+
+message VerifyTokenResponse { model.User item = 1; }
