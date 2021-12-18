@@ -31,6 +31,7 @@ async function main() {
     server.addService(userProto.UserService.service, {
         registerUser: handler.register,
         loginUser: handler.loginUser,
+        activateUser: handler.activateUser,
         resendActivationCode: handler.resendActivationCode,
     })
     

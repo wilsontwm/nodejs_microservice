@@ -8,6 +8,7 @@ service UserService {
     rpc registerUser(RegisterUserRequest) returns (RegisterUserResponse) {}
     rpc loginUser(LoginUserRequest) returns (LoginUserResponse) {}
     rpc resendActivationCode(ResendActivationCodeRequest) returns (ResendActivationCodeResponse) {}
+    rpc activateUser(ActivateUserRequest) returns (ActivateUserResponse) {}
 }
 
 message RegisterUserRequest {
@@ -26,9 +27,17 @@ message ResendActivationCodeRequest {
     string email = 1;
 }
 
+message ActivateUserRequest {
+    string code = 1;
+}
+
 message RegisterUserResponse { model.User item = 1; }
-message ResendActivationCodeResponse { model.User item = 1; }
+
 message LoginUserResponse { 
     model.User item = 1; 
     string token = 2;
 }
+
+message ResendActivationCodeResponse { model.User item = 1; }
+
+message ActivateUserResponse { model.User item = 1; }

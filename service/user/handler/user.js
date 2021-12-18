@@ -92,6 +92,12 @@ module.exports = class API {
                 message: "User is not registered"
             });
             return
+        } else if(user.isActivated) {
+            callback({
+                code: this.grpc.status.FAILED_PRECONDITION,
+                message: "User is activated"
+            })
+            return
         }
 
         try {
@@ -101,6 +107,33 @@ module.exports = class API {
             let result = await userRepository.updateUser(user)
 
             // TODO: Send activation code email
+
+            callback(null, {
+                item: userTransformer.toUser(result)
+            })
+        } catch (err){
+            callback({
+                code: this.grpc.status.INTERNAL,
+                message: err.message
+            })
+        }
+    }
+
+    activateUser = async(payload, callback) => {
+        let user = await userRepository.getUserByActivationCode(payload.request.code)
+        if(!user) {
+            callback({
+                code: this.grpc.status.NOT_FOUND,
+                message: "User is not found"
+            });
+            return
+        }
+
+        try {
+            user.activationCode = null;
+            user.updatedAt = Date.now();
+
+            let result = await userRepository.updateUser(user)
 
             callback(null, {
                 item: userTransformer.toUser(result)

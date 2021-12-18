@@ -71,6 +71,17 @@ exports.getUserByEmail = async(email) => {
     });
 }
 
+exports.getUserByActivationCode = async(code) => {
+    return new Promise((resolve, reject) => {
+        User.findOne({activationCode: code}).exec()
+        .then(result => {
+            resolve(result);            
+        }).catch(err => {
+            reject(err);
+        });
+    });
+}
+
 exports.createUser = ({firstName, lastName, email, password}) => {
     return new Promise((resolve, reject) => {
         bcrypt.genSalt(10, (err, salt) => {
