@@ -1,0 +1,23 @@
+{
+  "name": "mail-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@grpc/proto-loader": "^0.6.7",
+    "dotenv": "^10.0.0",
+    "google-protobuf": "^3.19.1",
+    "grpc": "^1.24.11",
+    "lodash": "^4.17.21",
+    "node-mailjet": "^3.3.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
