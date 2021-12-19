@@ -33,6 +33,7 @@ module.exports = class MailjetClient extends MailClient {
 
             if(recs.length == 0) {
                 reject(new Error("Recipients cannot be empty"))
+                return
             } 
 
             this.client.post("send", {'version': 'v3.1'})

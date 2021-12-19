@@ -19,6 +19,7 @@
     "is-empty": "^1.2.0",
     "lodash": "^4.17.21",
     "node-mailjet": "^3.3.4",
+    "nodemailer": "^6.7.2",
     "path": "^0.12.7"
   },
   "devDependencies": {

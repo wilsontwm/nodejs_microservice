@@ -1,8 +1,9 @@
-const MailjetClient = require("../package/mail/mailjet/mailjet");
 const empty = require("is-empty")
 const fs = require("fs");
 const handlebars = require('handlebars');
 const path = require('path');
+const SMTPClient = require("../package/mail/smtp/smtp");
+const MailjetClient = require("../package/mail/mailjet/mailjet");
 
 module.exports = class API {
     constructor(grpc) {
@@ -13,6 +14,8 @@ module.exports = class API {
         switch(client) {
             case "MAILJET":
                 return new MailjetClient();
+            case "SMTP":
+                return new SMTPClient();
             default:
                 throw new Error("Invalid mail client")
         }
