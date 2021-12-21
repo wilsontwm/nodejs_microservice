@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package mail;
+
+service MailService {
+    rpc sendMail(SendMailRequest) returns (SendMailResponse) {}
+}
+
+message SendMailRecipient {
+    string email = 1 [json_name="email"];
+    string name = 2 [json_name="name"];
+}
+
+message SendMailTemplateValue {
+    string key = 1 [json_name="key"];
+    string value = 2 [json_name="value"];
+}
+
+message SendMailRequest {
+    string mailClient = 1 [json_name="mailClient"];
+    repeated SendMailRecipient recipients = 2 [json_name="recipients"];
+    string subject = 3 [json_name="subject"];
+    string content = 4 [json_name="content"];
+    string template = 5 [json_name="template"];
+    repeated SendMailTemplateValue templateValues = 6 [json_name="templateValues"];
+}
+
+message SendMailResponse { 
+    bool isSuccess = 1; 
+}

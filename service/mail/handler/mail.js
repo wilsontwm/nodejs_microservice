@@ -2,6 +2,7 @@ const empty = require("is-empty")
 const fs = require("fs");
 const handlebars = require('handlebars');
 const path = require('path');
+const messages = require('../protobuf/mail_pb');
 const SMTPClient = require("../package/mail/smtp/smtp");
 const MailjetClient = require("../package/mail/mailjet/mailjet");
 
@@ -35,13 +36,14 @@ module.exports = class API {
     }
 
     sendMail = async (payload, callback) => {
-        this.getMailClient(payload.request.mailClient).then(async (mailClient) => {
+        const request = payload.request.toObject();
+        this.getMailClient(request.mailclient).then(async (mailClient) => {
             try {
-                let content = payload.request.content;
-                if(!empty(payload.request.template)) {
-                    const filePath = path.join(__dirname, '../resource/') + payload.request.template + '.html'
+                let content = request.content;
+                if(!empty(request.template)) {
+                    const filePath = path.join(__dirname, '../resource/') + request.template + '.html'
                     let templateValues = {};
-                    payload.request.templateValues?.map((ele) => {
+                    request.templatevaluesList?.map((ele) => {
                         Object.assign(templateValues, {
                             [ele.key]: ele.value
                         })
@@ -50,10 +52,11 @@ module.exports = class API {
                     content = await this.getMailContent(filePath, templateValues);
                 }
                 
-                const result = await mailClient.sendMail(payload.request.recipients, payload.request.subject, content);
-                callback(null, {
-                    isSuccess: result,
-                })
+                const result = await mailClient.sendMail(request.recipientsList, request.subject, content);
+
+                var reply = new messages.SendMailResponse();
+                reply.setIssuccess(result);
+                callback(null, reply);
             } catch (e) {
                 callback({
                     code: this.grpc.status.FAILED_PRECONDITION,

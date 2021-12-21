@@ -3,23 +3,25 @@ require('dotenv').config();
 // const Bootstrap = require('./bootstrap/index');
 const Handler = require("./handler/mail");
 
-const grpc = require('grpc');
-const protoLoader = require('@grpc/proto-loader');
 const _ = require('lodash');
+const grpc = require('@grpc/grpc-js');
+const mailProto = require("./protobuf/mail_grpc_pb");
+// const grpc = require('grpc');
+// const protoLoader = require('@grpc/proto-loader');
 
-const PROTO_PATH = __dirname + '/protos/mail.proto';
+// const PROTO_PATH = __dirname + '/protos/mail.proto';
 
-// Load the proto files
-let packageDefinition = protoLoader.loadSync(
-    PROTO_PATH,
-    {keepCase: true,
-     longs: String,
-     enums: String,
-     defaults: true,
-     oneofs: true,
-     includeDirs: [ __dirname + '/protos' ]  
-    });
-let mailProto = grpc.loadPackageDefinition(packageDefinition).mail;
+// // Load the proto files
+// let packageDefinition = protoLoader.loadSync(
+//     PROTO_PATH,
+//     {keepCase: true,
+//      longs: String,
+//      enums: String,
+//      defaults: true,
+//      oneofs: true,
+//      includeDirs: [ __dirname + '/protos' ]  
+//     });
+// let mailProto = grpc.loadPackageDefinition(packageDefinition).mail;
 
 async function main() {
     // Initialize the tools
@@ -28,7 +30,7 @@ async function main() {
 
     let server = new grpc.Server();
     const handler = new Handler(grpc);
-    server.addService(mailProto.MailService.service, {
+    server.addService(mailProto.MailServiceService, {
         sendMail: handler.sendMail,
     })
     
