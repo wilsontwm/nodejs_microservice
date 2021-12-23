@@ -1,12 +1,16 @@
+const messages = require('../protobuf/model/user_pb');
+
 exports.toUser = (userModel) => {
-    return {
-        id: userModel.id.toString(),
-        firstName: userModel.firstName,
-        lastName: userModel.lastName,
-        email: userModel.email,
-        activationCode: userModel.activationCode,
-        createdDateTime: userModel.createdAt.toISOString(),
-        updatedDateTime: userModel.updatedAt.toISOString()
- 
-    }
+    var user = new messages.User();
+    user.setId(userModel.id.toString());
+    user.setFirstname(userModel.firstName);
+    user.setLastname(userModel.lastName);
+    user.setEmail(userModel.email);
+    user.setCountrycode(userModel.countryCode);
+    user.setPhonenumber(userModel.phoneNumber);
+    user.setPhotourl(userModel.PhotoURL);
+    user.setActivationcode(userModel.activationCode);
+    user.setCreateddatetime(userModel.createdAt.toISOString());
+    user.setUpdateddatetime(userModel.updatedAt.toISOString());
+    return user;
 }

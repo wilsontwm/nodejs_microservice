@@ -106,7 +106,6 @@ exports.createUser = ({firstName, lastName, email, password}) => {
                     reject(err)
                     return
                 } 
-    
                 const id = new mongoose.Types.ObjectId();
                 const activationCode = md5(id.toString() + random.randomString(10));
                 // Generate a random activation code

@@ -4,12 +4,14 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "protobuf": "cp -R ../../protobuf/**/generated/js/* ./protobuf",
     "start": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@grpc/grpc-js": "^1.4.5",
     "@grpc/proto-loader": "^0.6.7",
     "bcrypt": "^5.0.1",
     "crypto": "^1.0.1",

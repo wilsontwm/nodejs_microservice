@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { randomString } = require('../kit/random');
+const messages = require('../protobuf/user_pb');
 const userRepository = require('../repository/user');
 const userTransformer = require("../transformer/user");
 
@@ -12,7 +13,8 @@ module.exports = class API {
     }
 
     register = async (payload, callback) => {
-        let user = await userRepository.getUserByEmail(payload.request.email)
+        const request = payload.request.toObject();
+        let user = await userRepository.getUserByEmail(request.email)
         if(user) {
             callback({
                 code: this.grpc.status.ALREADY_EXISTS,
@@ -23,15 +25,16 @@ module.exports = class API {
 
         try {
             let result = await userRepository.createUser({
-                firstName: payload.request.firstName,
-                lastName: payload.request.lastName,
-                email: payload.request.email,
-                password: payload.request.password,
+                firstName: request.firstname,
+                lastName: request.lastname,
+                email: request.email,
+                password: request.password,
             })
 
-            callback(null, {
-                item: userTransformer.toUser(result)
-            })
+            var response = new messages.RegisterUserResponse();
+            response.setItem(userTransformer.toUser(result));
+
+            callback(null, response)
         } catch (err){
             callback({
                 code: this.grpc.status.INTERNAL,
@@ -42,8 +45,9 @@ module.exports = class API {
     }
 
     loginUser = async(payload, callback) => {
+        const request = payload.request.toObject();
         // Get the user by email first
-        let user = await userRepository.getUserByEmail(payload.request.email)
+        let user = await userRepository.getUserByEmail(request.email)
         if(!user) {
             callback({
                 code: this.grpc.status.FAILED_PRECONDITION,
@@ -53,7 +57,7 @@ module.exports = class API {
         }
 
         // Check password
-        const match = await bcrypt.compare(payload.request.password, user.password);
+        const match = await bcrypt.compare(request.password, user.password);
         if(!match) {
             callback({
                 code: this.grpc.status.FAILED_PRECONDITION,
@@ -79,14 +83,16 @@ module.exports = class API {
             }
         );
 
-        callback(null, {
-            item: userTransformer.toUser(user),
-            token
-        })
+        var response = new messages.LoginUserResponse();
+        response.setItem(userTransformer.toUser(user));
+        response.setToken(token);
+
+        callback(null, response)
     }
 
     resendActivationCode = async(payload, callback) => {
-        let user = await userRepository.getUserByEmail(payload.request.email)
+        const request = payload.request.toObject();
+        let user = await userRepository.getUserByEmail(request.email)
         if(!user) {
             callback({
                 code: this.grpc.status.NOT_FOUND,
@@ -109,9 +115,9 @@ module.exports = class API {
 
             // TODO: Send activation code email
 
-            callback(null, {
-                item: userTransformer.toUser(result)
-            })
+            var response = new messages.ResendActivationCodeResponse();
+            response.setItem(userTransformer.toUser(result));
+            callback(null, response)
         } catch (err){
             callback({
                 code: this.grpc.status.INTERNAL,
@@ -121,7 +127,8 @@ module.exports = class API {
     }
 
     activateUser = async(payload, callback) => {
-        let user = await userRepository.getUserByActivationCode(payload.request.code)
+        const request = payload.request.toObject();
+        let user = await userRepository.getUserByActivationCode(request.code)
         if(!user) {
             callback({
                 code: this.grpc.status.NOT_FOUND,
@@ -136,9 +143,9 @@ module.exports = class API {
 
             let result = await userRepository.updateUser(user)
 
-            callback(null, {
-                item: userTransformer.toUser(result)
-            })
+            var response = new messages.ActivateUserResponse();
+            response.setItem(userTransformer.toUser(result));
+            callback(null, response)
         } catch (err){
             callback({
                 code: this.grpc.status.INTERNAL,
@@ -148,7 +155,8 @@ module.exports = class API {
     }
 
     forgetPassword = async(payload, callback) => {
-        let user = await userRepository.getUserByEmail(payload.request.email)
+        const request = payload.request.toObject();
+        let user = await userRepository.getUserByEmail(request.email)
         if(!user) {
             callback({
                 code: this.grpc.status.NOT_FOUND,
@@ -175,9 +183,10 @@ module.exports = class API {
 
             // TODO: Send reset password email
 
-            callback(null, {
-                item: userTransformer.toUser(result)
-            })
+            var response = new messages.ForgetPasswordResponse();
+            response.setItem(userTransformer.toUser(result));
+            response.setToken(token);
+            callback(null, response)
         } catch (err){
             callback({
                 code: this.grpc.status.INTERNAL,
@@ -187,7 +196,8 @@ module.exports = class API {
     }
 
     resetPassword = async(payload, callback) => {
-        let user = await userRepository.getUserByResetPasswordToken(payload.request.code)
+        const request = payload.request.toObject();
+        let user = await userRepository.getUserByResetPasswordToken(request.code)
         if(!user) {
             callback({
                 code: this.grpc.status.NOT_FOUND,
@@ -199,7 +209,7 @@ module.exports = class API {
         try {
 
             const salt = await bcrypt.genSalt(10);
-            const passwordHash = await bcrypt.hash(payload.request.password, salt);
+            const passwordHash = await bcrypt.hash(request.password, salt);
     
             user.password = passwordHash;
             user.resetPasswordToken = null;
@@ -207,10 +217,9 @@ module.exports = class API {
             user.updatedAt = Date.now();
 
             let result = await userRepository.updateUser(user)
-
-            callback(null, {
-                item: userTransformer.toUser(result)
-            })
+            var response = new messages.ResetPasswordResponse();
+            response.setItem(userTransformer.toUser(result));
+            callback(null, response)
         } catch (err){
             callback({
                 code: this.grpc.status.INTERNAL,
@@ -220,7 +229,8 @@ module.exports = class API {
     }
 
     verifyToken = async(payload, callback) => {
-        jwt.verify(payload.request.token, process.env.JWT_KEY, async(err, decoded) => {
+        const request = payload.request.toObject();
+        jwt.verify(request.token, process.env.JWT_KEY, async(err, decoded) => {
             if(err) {
                 callback({
                     code: this.grpc.status.UNAUTHENTICATED,
@@ -238,9 +248,10 @@ module.exports = class API {
                 return
             }
 
-            callback(null, {
-                item: userTransformer.toUser(user)
-            })
+            
+            var response = new messages.VerifyTokenResponse();
+            response.setItem(userTransformer.toUser(user));
+            callback(null, response)
         });
         
     }
