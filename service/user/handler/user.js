@@ -4,12 +4,14 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { randomString } = require('../kit/random');
 const messages = require('../protobuf/user_pb');
+const mailMessages = require('../protobuf/mail_pb');
 const userRepository = require('../repository/user');
 const userTransformer = require("../transformer/user");
 
 module.exports = class API {
-    constructor(grpc) {
+    constructor(grpc, services) {
         this.grpc = grpc;
+        this.services = services;
     }
 
     register = async (payload, callback) => {
@@ -30,6 +32,31 @@ module.exports = class API {
                 email: request.email,
                 password: request.password,
             })
+
+            // Send email to user
+            var mailRequest = new mailMessages.SendMailRequest();
+            var mailRecipients = Array();
+            var mailRecipient = new mailMessages.SendMailRecipient();
+            mailRecipient.setEmail(request.email);
+            mailRecipient.setName(request.firstname + " " + request.lastname);
+            mailRecipients.push(mailRecipient);
+
+            var templateValues = Array();
+            var templateValue = new mailMessages.SendMailTemplateValue();
+            templateValue.setKey("activationCode");
+            templateValue.setValue(result.activationCode);
+            templateValues.push(templateValue);
+
+            mailRequest.setMailclient(process.env.SERVICE_MAIL_CLIENT);
+            mailRequest.setRecipientsList(mailRecipients);
+            mailRequest.setSubject("Activate Your Account");
+            mailRequest.setTemplate("register");
+            mailRequest.setTemplatevaluesList(templateValues);
+            
+            this.services.mailService.sendMail(mailRequest, function(err, response) {
+                console.log('Send mail:', response);
+                console.log('Err: ', err)
+            });
 
             var response = new messages.RegisterUserResponse();
             response.setItem(userTransformer.toUser(result));

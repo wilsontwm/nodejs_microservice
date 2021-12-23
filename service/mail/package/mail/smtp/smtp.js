@@ -61,9 +61,9 @@ module.exports = class SMTPClient extends MailClient {
                     reject(err);
                     return
                 }
-                // console.log('Message sent: %s', info.messageId);
+                console.log('Message sent: %s', info.messageId);
                 // Preview only available when sending through an Ethereal account
-                // console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+                console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
                 resolve(true);
             });
             

@@ -34,7 +34,7 @@ async function main() {
         sendMail: handler.sendMail,
     })
     
-    let address = process.env.HOST + ":" + process.env.PORT;
+    let address = process.env.SERVICE_MAIL;
     server.bindAsync(address, grpc.ServerCredentials.createInsecure(), () => {
         server.start();
         console.log("Server running at " + address);
