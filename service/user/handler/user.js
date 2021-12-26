@@ -140,7 +140,30 @@ module.exports = class API {
 
             let result = await userRepository.updateUser(user)
 
-            // TODO: Send activation code email
+            // Send email to user
+            var mailRequest = new mailMessages.SendMailRequest();
+            var mailRecipients = Array();
+            var mailRecipient = new mailMessages.SendMailRecipient();
+            mailRecipient.setEmail(user.email);
+            mailRecipient.setName(user.firstname + " " + user.lastname);
+            mailRecipients.push(mailRecipient);
+
+            var templateValues = Array();
+            var templateValue = new mailMessages.SendMailTemplateValue();
+            templateValue.setKey("activationCode");
+            templateValue.setValue(user.activationCode);
+            templateValues.push(templateValue);
+
+            mailRequest.setMailclient(process.env.SERVICE_MAIL_CLIENT);
+            mailRequest.setRecipientsList(mailRecipients);
+            mailRequest.setSubject("Activate Your Account");
+            mailRequest.setTemplate("register");
+            mailRequest.setTemplatevaluesList(templateValues);
+            
+            this.services.mailService.sendMail(mailRequest, function(err, response) {
+                console.log('Send mail:', response);
+                console.log('Err: ', err)
+            });
 
             var response = new messages.ResendActivationCodeResponse();
             response.setItem(userTransformer.toUser(result));
@@ -208,7 +231,30 @@ module.exports = class API {
 
             let result = await userRepository.updateUser(user)
 
-            // TODO: Send reset password email
+            // Send email to user
+            var mailRequest = new mailMessages.SendMailRequest();
+            var mailRecipients = Array();
+            var mailRecipient = new mailMessages.SendMailRecipient();
+            mailRecipient.setEmail(user.email);
+            mailRecipient.setName(user.firstname + " " + user.lastname);
+            mailRecipients.push(mailRecipient);
+
+            var templateValues = Array();
+            var templateValue = new mailMessages.SendMailTemplateValue();
+            templateValue.setKey("resetToken");
+            templateValue.setValue(result.resetPasswordToken);
+            templateValues.push(templateValue);
+
+            mailRequest.setMailclient(process.env.SERVICE_MAIL_CLIENT);
+            mailRequest.setRecipientsList(mailRecipients);
+            mailRequest.setSubject("Reset Your Password");
+            mailRequest.setTemplate("reset_password");
+            mailRequest.setTemplatevaluesList(templateValues);
+
+            this.services.mailService.sendMail(mailRequest, function(err, response) {
+                console.log('Send mail:', response);
+                console.log('Err: ', err)
+            });
 
             var response = new messages.ForgetPasswordResponse();
             response.setItem(userTransformer.toUser(result));
