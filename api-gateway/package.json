@@ -1,0 +1,26 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "Base application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "protobuf": "cp -R ../protobuf/**/generated/js/* ./protobuf",
+    "start": "nodemon server.js"
+  },
+  "author": "Wilson TAN",
+  "license": "ISC",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.4.5",
+    "body-parser": "^1.19.1",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.2",
+    "google-protobuf": "^3.19.1",
+    "jsonwebtoken": "^8.5.1",
+    "validatorjs": "^3.22.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
