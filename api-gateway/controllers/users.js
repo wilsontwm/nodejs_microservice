@@ -7,12 +7,6 @@ module.exports =  class UserController extends Controller {
         super();
     }
 
-    test = (req, callback) => {
-        console.log("Req", req);
-        console.log("callback", callback)
-        throw new Error("Wrong")
-    }
-
     user_register = async(req, res, next) => {
         try {
             let rules = {
@@ -126,6 +120,79 @@ module.exports =  class UserController extends Controller {
             
             return res.status(200).json(response.toObject())
     
+        } catch (e){
+            return res.status(500).json({
+                code: e.code,
+                error: e.details,
+                debug: e.message
+            });
+        }
+    }
+
+    user_forget_password = async(req, res, next) => {
+        try {
+            let rules = {
+                email: 'required|email',
+            };
+              
+            let validation = new Validator(req.body, rules);
+            
+            if(!validation.passes()) {
+                return res.status(412).json(validation.errors);
+            }
+            
+            var forgetPasswordRequest = new userMessage.ForgetPasswordRequest();
+            forgetPasswordRequest.setEmail(req.body.email);
+            
+            const response = await this.services.userService.forgetPassword(forgetPasswordRequest);
+            
+            return res.status(200).json(response.toObject())
+    
+        } catch (e){
+            return res.status(500).json({
+                code: e.code,
+                error: e.details,
+                debug: e.message
+            });
+        }
+    }
+
+    user_reset_password = async(req, res, next) => {
+        try {
+            let rules = {
+                code: 'required',
+                password: 'required|min:8',
+            };
+
+            req.body.code = req.params.code
+
+            let validation = new Validator(req.body, rules);
+            
+            if(!validation.passes()) {
+                return res.status(412).json(validation.errors);
+            }
+            
+            var resetPasswordRequest = new userMessage.ResetPasswordRequest();
+            resetPasswordRequest.setCode(req.body.code);
+            resetPasswordRequest.setPassword(req.body.password);
+            
+            const response = await this.services.userService.resetPassword(resetPasswordRequest);
+            
+            return res.status(200).json(response.toObject())
+    
+        } catch (e){
+            return res.status(500).json({
+                code: e.code,
+                error: e.details,
+                debug: e.message
+            });
+        }
+    }
+
+    user_get_profile = async(req, res, next) => {
+        try {
+            const user = res.locals.user
+            return res.status(200).json(user);
         } catch (e){
             return res.status(500).json({
                 code: e.code,
