@@ -11,6 +11,8 @@ router.post('/activate/resend', controllers.userController.user_resend_activatio
 router.get('/activate/:code', controllers.userController.user_activate);
 router.post('/password/forget', controllers.userController.user_forget_password);
 router.post('/password/reset/:code', controllers.userController.user_reset_password);
+router.post('/google/oauth', controllers.userController.user_google_oauth);
+router.get('/google/oauth/callback', controllers.userController.user_google_oauth_callback);
 router.get('/profile', middleware.authentication.check_user_authentication, controllers.userController.user_get_profile);
 
 module.exports = router;

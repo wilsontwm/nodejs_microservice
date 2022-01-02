@@ -201,4 +201,49 @@ module.exports =  class UserController extends Controller {
             });
         }
     }
+
+    user_google_oauth = async(req, res, next) => {
+        try {
+            
+            var googleOAuthRequest = new userMessage.GoogleOAuthRequest();
+            
+            const response = await this.services.userService.googleOAuth(googleOAuthRequest);
+            
+            return res.status(200).json(response.toObject())
+    
+        } catch (e){
+            return res.status(500).json({
+                code: e.code,
+                error: e.details,
+                debug: e.message
+            });
+        }
+    }
+
+    user_google_oauth_callback = async(req, res, next) => {
+        try {
+            let rules = {
+                code: 'required',
+            };
+            let validation = new Validator(req.query, rules);
+            
+            if(!validation.passes()) {
+                return res.status(412).json(validation.errors);
+            }
+            
+            var googleOAuthCallbackRequest = new userMessage.GoogleOAuthCallbackRequest();
+            googleOAuthCallbackRequest.setToken(req.query.code);
+            
+            const response = await this.services.userService.googleOAuthCallback(googleOAuthCallbackRequest);
+            
+            return res.status(200).json(response.toObject())
+    
+        } catch (e){
+            return res.status(500).json({
+                code: e.code,
+                error: e.details,
+                debug: e.message
+            });
+        }
+    }
 }

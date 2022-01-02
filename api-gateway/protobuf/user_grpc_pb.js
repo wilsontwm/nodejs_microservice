@@ -49,6 +49,50 @@ function deserialize_user_ForgetPasswordResponse(buffer_arg) {
   return user_pb.ForgetPasswordResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_user_GoogleOAuthCallbackRequest(arg) {
+  if (!(arg instanceof user_pb.GoogleOAuthCallbackRequest)) {
+    throw new Error('Expected argument of type user.GoogleOAuthCallbackRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_user_GoogleOAuthCallbackRequest(buffer_arg) {
+  return user_pb.GoogleOAuthCallbackRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_user_GoogleOAuthCallbackResponse(arg) {
+  if (!(arg instanceof user_pb.GoogleOAuthCallbackResponse)) {
+    throw new Error('Expected argument of type user.GoogleOAuthCallbackResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_user_GoogleOAuthCallbackResponse(buffer_arg) {
+  return user_pb.GoogleOAuthCallbackResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_user_GoogleOAuthRequest(arg) {
+  if (!(arg instanceof user_pb.GoogleOAuthRequest)) {
+    throw new Error('Expected argument of type user.GoogleOAuthRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_user_GoogleOAuthRequest(buffer_arg) {
+  return user_pb.GoogleOAuthRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_user_GoogleOAuthResponse(arg) {
+  if (!(arg instanceof user_pb.GoogleOAuthResponse)) {
+    throw new Error('Expected argument of type user.GoogleOAuthResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_user_GoogleOAuthResponse(buffer_arg) {
+  return user_pb.GoogleOAuthResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_user_LoginUserRequest(arg) {
   if (!(arg instanceof user_pb.LoginUserRequest)) {
     throw new Error('Expected argument of type user.LoginUserRequest');
@@ -237,6 +281,28 @@ var UserServiceService = exports.UserServiceService = {
     requestDeserialize: deserialize_user_VerifyTokenRequest,
     responseSerialize: serialize_user_VerifyTokenResponse,
     responseDeserialize: deserialize_user_VerifyTokenResponse,
+  },
+  googleOAuth: {
+    path: '/user.UserService/googleOAuth',
+    requestStream: false,
+    responseStream: false,
+    requestType: user_pb.GoogleOAuthRequest,
+    responseType: user_pb.GoogleOAuthResponse,
+    requestSerialize: serialize_user_GoogleOAuthRequest,
+    requestDeserialize: deserialize_user_GoogleOAuthRequest,
+    responseSerialize: serialize_user_GoogleOAuthResponse,
+    responseDeserialize: deserialize_user_GoogleOAuthResponse,
+  },
+  googleOAuthCallback: {
+    path: '/user.UserService/googleOAuthCallback',
+    requestStream: false,
+    responseStream: false,
+    requestType: user_pb.GoogleOAuthCallbackRequest,
+    responseType: user_pb.GoogleOAuthCallbackResponse,
+    requestSerialize: serialize_user_GoogleOAuthCallbackRequest,
+    requestDeserialize: deserialize_user_GoogleOAuthCallbackRequest,
+    responseSerialize: serialize_user_GoogleOAuthCallbackResponse,
+    responseDeserialize: deserialize_user_GoogleOAuthCallbackResponse,
   },
 };
 
