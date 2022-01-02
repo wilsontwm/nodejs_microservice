@@ -93,7 +93,7 @@ exports.getUserByResetPasswordToken = async(token) => {
     });
 }
 
-exports.createUser = ({firstName, lastName, email, password}) => {
+exports.createUser = ({firstName, lastName, email, password, isRequireActivation}) => {
     return new Promise((resolve, reject) => {
         bcrypt.genSalt(10, (err, salt) => {
             if(err) {
@@ -107,7 +107,10 @@ exports.createUser = ({firstName, lastName, email, password}) => {
                     return
                 } 
                 const id = new mongoose.Types.ObjectId();
-                const activationCode = md5(id.toString() + random.randomString(10));
+                let activationCode = "";
+                if(isRequireActivation) {
+                    activationCode = md5(id.toString() + random.randomString(10));
+                }
                 // Generate a random activation code
                 const user = new User({
                     _id:  id,
@@ -131,6 +134,26 @@ exports.createUser = ({firstName, lastName, email, password}) => {
             });
         })
     });
+}
+
+exports.upsertUserFromProvider = ({email, firstName, lastName}) => {
+    return new Promise(async(resolve, reject) => {
+        let user = await this.getUserByEmail(email)
+
+        if (user) {
+            return resolve(user);
+        }
+
+        user = await this.createUser({
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            password: random.randomString(10),
+            isRequireActivation: false
+        })
+
+        return resolve(user)
+    })
 }
 
 exports.updateUser = (user) => {

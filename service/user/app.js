@@ -16,7 +16,7 @@ async function main() {
     const services = new Services();
 
     let server = new grpc.Server();
-    const handler = new Handler(grpc, services);
+    const handler = new Handler(grpc, bootstrap, services);
     server.addService(userProto.UserServiceService, {
         registerUser: handler.register,
         loginUser: handler.loginUser,
@@ -25,6 +25,8 @@ async function main() {
         forgetPassword: handler.forgetPassword,
         resetPassword: handler.resetPassword,
         verifyToken: handler.verifyToken,
+        googleOAuth: handler.googleOAuth,
+        googleOAuthCallback: handler.googleOAuthCallback,
     })
     
     let address = process.env.SERVICE_USER;

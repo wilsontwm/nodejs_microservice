@@ -12,6 +12,8 @@ service UserService {
     rpc forgetPassword(ForgetPasswordRequest) returns (ForgetPasswordResponse) {}
     rpc resetPassword(ResetPasswordRequest) returns (ResetPasswordResponse) {}
     rpc verifyToken(VerifyTokenRequest) returns (VerifyTokenResponse) {}
+    rpc googleOAuth(GoogleOAuthRequest) returns (GoogleOAuthResponse) {}
+    rpc googleOAuthCallback(GoogleOAuthCallbackRequest) returns (GoogleOAuthCallbackResponse) {}
 }
 
 message RegisterUserRequest {
@@ -47,6 +49,14 @@ message VerifyTokenRequest {
     string token = 1;
 }
 
+message GoogleOAuthRequest {
+
+}
+
+message GoogleOAuthCallbackRequest {
+    string token = 1;
+}
+
 message RegisterUserResponse { model.User item = 1; }
 
 message LoginUserResponse { 
@@ -66,3 +76,10 @@ message ForgetPasswordResponse {
 message ResetPasswordResponse { model.User item = 1; }
 
 message VerifyTokenResponse { model.User item = 1; }
+
+message GoogleOAuthResponse { string item = 1; }
+
+message GoogleOAuthCallbackResponse { 
+    model.User item = 1;
+    string token = 2;
+}

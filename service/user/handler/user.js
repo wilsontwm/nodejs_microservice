@@ -7,10 +7,12 @@ const messages = require('../protobuf/user_pb');
 const mailMessages = require('../protobuf/mail_pb');
 const userRepository = require('../repository/user');
 const userTransformer = require("../transformer/user");
+const { google } = require("googleapis");
 
 module.exports = class API {
-    constructor(grpc, services) {
+    constructor(grpc, bootstrap, services) {
         this.grpc = grpc;
+        this.bootstrap = bootstrap;
         this.services = services;
     }
 
@@ -31,6 +33,7 @@ module.exports = class API {
                 lastName: request.lastname,
                 email: request.email,
                 password: request.password,
+                isRequireActivation: true
             })
 
             // Send email to user
@@ -327,5 +330,73 @@ module.exports = class API {
             callback(null, response)
         });
         
+    }
+
+    googleOAuth = async(payload, callback) => {
+        const request = payload.request.toObject();
+
+        const defaultScope = [
+            // 'https://www.googleapis.com/auth/plus.me',
+            'https://www.googleapis.com/auth/userinfo.profile',
+            'https://www.googleapis.com/auth/userinfo.email',
+        ];
+        
+        try {
+            const url = this.bootstrap.googleOAuth.generateAuthUrl({
+                access_type: 'offline',
+                prompt: 'consent',
+                scope: defaultScope
+            });
+
+            var response = new messages.GoogleOAuthResponse();
+            response.setItem(url);
+            callback(null, response)
+        } catch (err) {
+            callback({
+                code: this.grpc.status.INTERNAL,
+                message: err.message
+            })
+        }
+    }
+
+    googleOAuthCallback = async(payload, callback) => {
+        const request = payload.request.toObject();
+
+        try {
+            const googleOAuthClient = this.bootstrap.googleOAuth;
+            const dataResp = await googleOAuthClient.getToken(request.token);
+            const tokens = dataResp.tokens;
+
+            googleOAuthClient.setCredentials(tokens);
+            const oauth2 = google.oauth2({ version: 'v2', auth: googleOAuthClient });
+            const { data } = await oauth2.userinfo.get(); 
+
+            const user = await userRepository.upsertUserFromProvider({
+                firstName: data.given_name,
+                lastName: data.family_name,
+                email: data.email
+            });
+
+            const token = jwt.sign(
+                {
+                    id: user._id,
+                    email: user.email
+                }, 
+                process.env.JWT_KEY,
+                {
+                    expiresIn: "1h"
+                }
+            );
+
+            var response = new messages.GoogleOAuthCallbackResponse();
+            response.setItem(userTransformer.toUser(user));
+            response.setToken(token);
+            callback(null, response)
+        } catch (err) {
+            callback({
+                code: this.grpc.status.INTERNAL,
+                message: err.message
+            })
+        }
     }
 }
