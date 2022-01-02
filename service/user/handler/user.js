@@ -8,6 +8,8 @@ const mailMessages = require('../protobuf/mail_pb');
 const userRepository = require('../repository/user');
 const userTransformer = require("../transformer/user");
 const { google } = require("googleapis");
+const queryString = require("query-string");
+const axios = require("axios");
 
 module.exports = class API {
     constructor(grpc, bootstrap, services) {
@@ -389,6 +391,84 @@ module.exports = class API {
             );
 
             var response = new messages.GoogleOAuthCallbackResponse();
+            response.setItem(userTransformer.toUser(user));
+            response.setToken(token);
+            callback(null, response)
+        } catch (err) {
+            callback({
+                code: this.grpc.status.INTERNAL,
+                message: err.message
+            })
+        }
+    }
+
+    facebookOAuth = async(payload, callback) => {
+        const request = payload.request.toObject();
+
+        try {
+            const stringifiedParams = queryString.stringify({
+                client_id: process.env.FACEBOOK_CLIENT_ID,
+                redirect_uri: process.env.FACEBOOK_OAUTH_REDIRECT,
+                scope: ['email', 'public_profile'].join(','), // comma seperated string
+                response_type: 'code',
+                auth_type: 'rerequest',
+                display: 'popup',
+            });
+
+            const facebookLoginUrl = `https://www.facebook.com/v12.0/dialog/oauth?${stringifiedParams}`;
+            var response = new messages.FacebookOAuthResponse();
+            response.setItem(facebookLoginUrl);
+            callback(null, response)
+        } catch (err) {
+            callback({
+                code: this.grpc.status.INTERNAL,
+                message: err.message
+            })
+        }
+    }
+
+    facebookOAuthCallback = async(payload, callback) => {
+        const request = payload.request.toObject();
+
+        try {
+            const { data } = await axios({
+                url: 'https://graph.facebook.com/v12.0/oauth/access_token',
+                method: 'get',
+                params: {
+                  client_id: process.env.FACEBOOK_CLIENT_ID,
+                  client_secret: process.env.FACEBOOK_CLIENT_SECRET,
+                  redirect_uri: process.env.FACEBOOK_OAUTH_REDIRECT,
+                  code: request.token,
+                },
+            });
+
+            const resp = await axios({
+                url: 'https://graph.facebook.com/me',
+                method: 'get',
+                params: {
+                  fields: ['id', 'email', 'first_name', 'last_name'].join(','),
+                  access_token: data.access_token,
+                },
+            });
+              
+            const user = await userRepository.upsertUserFromProvider({
+                firstName: resp.data.first_name,
+                lastName: resp.data.last_name,
+                email: resp.data.email
+            });
+
+            const token = jwt.sign(
+                {
+                    id: user._id,
+                    email: user.email
+                }, 
+                process.env.JWT_KEY,
+                {
+                    expiresIn: "1h"
+                }
+            );
+
+            var response = new messages.FacebookOAuthCallbackResponse();
             response.setItem(userTransformer.toUser(user));
             response.setToken(token);
             callback(null, response)

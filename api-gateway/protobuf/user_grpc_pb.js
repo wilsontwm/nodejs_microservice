@@ -27,6 +27,50 @@ function deserialize_user_ActivateUserResponse(buffer_arg) {
   return user_pb.ActivateUserResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_user_FacebookOAuthCallbackRequest(arg) {
+  if (!(arg instanceof user_pb.FacebookOAuthCallbackRequest)) {
+    throw new Error('Expected argument of type user.FacebookOAuthCallbackRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_user_FacebookOAuthCallbackRequest(buffer_arg) {
+  return user_pb.FacebookOAuthCallbackRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_user_FacebookOAuthCallbackResponse(arg) {
+  if (!(arg instanceof user_pb.FacebookOAuthCallbackResponse)) {
+    throw new Error('Expected argument of type user.FacebookOAuthCallbackResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_user_FacebookOAuthCallbackResponse(buffer_arg) {
+  return user_pb.FacebookOAuthCallbackResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_user_FacebookOAuthRequest(arg) {
+  if (!(arg instanceof user_pb.FacebookOAuthRequest)) {
+    throw new Error('Expected argument of type user.FacebookOAuthRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_user_FacebookOAuthRequest(buffer_arg) {
+  return user_pb.FacebookOAuthRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_user_FacebookOAuthResponse(arg) {
+  if (!(arg instanceof user_pb.FacebookOAuthResponse)) {
+    throw new Error('Expected argument of type user.FacebookOAuthResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_user_FacebookOAuthResponse(buffer_arg) {
+  return user_pb.FacebookOAuthResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_user_ForgetPasswordRequest(arg) {
   if (!(arg instanceof user_pb.ForgetPasswordRequest)) {
     throw new Error('Expected argument of type user.ForgetPasswordRequest');
@@ -303,6 +347,28 @@ var UserServiceService = exports.UserServiceService = {
     requestDeserialize: deserialize_user_GoogleOAuthCallbackRequest,
     responseSerialize: serialize_user_GoogleOAuthCallbackResponse,
     responseDeserialize: deserialize_user_GoogleOAuthCallbackResponse,
+  },
+  facebookOAuth: {
+    path: '/user.UserService/facebookOAuth',
+    requestStream: false,
+    responseStream: false,
+    requestType: user_pb.FacebookOAuthRequest,
+    responseType: user_pb.FacebookOAuthResponse,
+    requestSerialize: serialize_user_FacebookOAuthRequest,
+    requestDeserialize: deserialize_user_FacebookOAuthRequest,
+    responseSerialize: serialize_user_FacebookOAuthResponse,
+    responseDeserialize: deserialize_user_FacebookOAuthResponse,
+  },
+  facebookOAuthCallback: {
+    path: '/user.UserService/facebookOAuthCallback',
+    requestStream: false,
+    responseStream: false,
+    requestType: user_pb.FacebookOAuthCallbackRequest,
+    responseType: user_pb.FacebookOAuthCallbackResponse,
+    requestSerialize: serialize_user_FacebookOAuthCallbackRequest,
+    requestDeserialize: deserialize_user_FacebookOAuthCallbackRequest,
+    responseSerialize: serialize_user_FacebookOAuthCallbackResponse,
+    responseDeserialize: deserialize_user_FacebookOAuthCallbackResponse,
   },
 };
 

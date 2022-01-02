@@ -27,6 +27,8 @@ async function main() {
         verifyToken: handler.verifyToken,
         googleOAuth: handler.googleOAuth,
         googleOAuthCallback: handler.googleOAuthCallback,
+        facebookOAuth: handler.facebookOAuth,
+        facebookOAuthCallback: handler.facebookOAuthCallback,
     })
     
     let address = process.env.SERVICE_USER;

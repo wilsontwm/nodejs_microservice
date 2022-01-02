@@ -14,6 +14,8 @@ service UserService {
     rpc verifyToken(VerifyTokenRequest) returns (VerifyTokenResponse) {}
     rpc googleOAuth(GoogleOAuthRequest) returns (GoogleOAuthResponse) {}
     rpc googleOAuthCallback(GoogleOAuthCallbackRequest) returns (GoogleOAuthCallbackResponse) {}
+    rpc facebookOAuth(FacebookOAuthRequest) returns (FacebookOAuthResponse) {}
+    rpc facebookOAuthCallback(FacebookOAuthCallbackRequest) returns (FacebookOAuthCallbackResponse) {}
 }
 
 message RegisterUserRequest {
@@ -57,6 +59,14 @@ message GoogleOAuthCallbackRequest {
     string token = 1;
 }
 
+message FacebookOAuthRequest {
+
+}
+
+message FacebookOAuthCallbackRequest {
+    string token = 1;
+}
+
 message RegisterUserResponse { model.User item = 1; }
 
 message LoginUserResponse { 
@@ -80,6 +90,13 @@ message VerifyTokenResponse { model.User item = 1; }
 message GoogleOAuthResponse { string item = 1; }
 
 message GoogleOAuthCallbackResponse { 
+    model.User item = 1;
+    string token = 2;
+}
+
+message FacebookOAuthResponse { string item = 1; }
+
+message FacebookOAuthCallbackResponse { 
     model.User item = 1;
     string token = 2;
 }

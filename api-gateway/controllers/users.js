@@ -246,4 +246,49 @@ module.exports =  class UserController extends Controller {
             });
         }
     }
+
+    user_facebook_oauth = async(req, res, next) => {
+        try {
+            
+            var facebookAuthRequest = new userMessage.FacebookOAuthRequest();
+            
+            const response = await this.services.userService.facebookOAuth(facebookAuthRequest);
+            
+            return res.status(200).json(response.toObject())
+    
+        } catch (e){
+            return res.status(500).json({
+                code: e.code,
+                error: e.details,
+                debug: e.message
+            });
+        }
+    }
+
+    user_facebook_oauth_callback = async(req, res, next) => {
+        try {
+            let rules = {
+                code: 'required',
+            };
+            let validation = new Validator(req.query, rules);
+            
+            if(!validation.passes()) {
+                return res.status(412).json(validation.errors);
+            }
+            
+            var facebookOAuthCallbackRequest = new userMessage.FacebookOAuthCallbackRequest();
+            facebookOAuthCallbackRequest.setToken(req.query.code);
+            
+            const response = await this.services.userService.facebookOAuthCallback(facebookOAuthCallbackRequest);
+            
+            return res.status(200).json(response.toObject())
+    
+        } catch (e){
+            return res.status(500).json({
+                code: e.code,
+                error: e.details,
+                debug: e.message
+            });
+        }
+    }
 }
